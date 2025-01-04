@@ -10,6 +10,7 @@ class UrlLauncherUI extends StatefulWidget {
 
 class _UrlLauncherUIState extends State<UrlLauncherUI> {
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController phoneControllerSms = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController websiteController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
@@ -27,10 +28,12 @@ class _UrlLauncherUIState extends State<UrlLauncherUI> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
+            // Phone Number Input Field with Hint Text
             TextField(
               controller: phoneController,
               decoration: const InputDecoration(
                 labelText: 'Enter Phone Number',
+                hintText: 'e.g. 01015415210',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.phone,
@@ -40,16 +43,19 @@ class _UrlLauncherUIState extends State<UrlLauncherUI> {
               onPressed: () async {
                 final phone = phoneController.text.trim();
                 if (phone.isNotEmpty) {
-                  await UrlLauncherHelper.launchPhoneCall(phone);
+                  await UrlLauncherHelper.launchPhoneCall(context, phone);
                 }
               },
               child: const Text('Make a Phone Call'),
             ),
             const SizedBox(height: 16),
+
+            // Email Input Field with Hint Text
             TextField(
               controller: emailController,
               decoration: const InputDecoration(
                 labelText: 'Enter Email Address',
+                hintText: 'e.g. example@example.com',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
@@ -59,20 +65,19 @@ class _UrlLauncherUIState extends State<UrlLauncherUI> {
               onPressed: () async {
                 final email = emailController.text.trim();
                 if (email.isNotEmpty) {
-                  await UrlLauncherHelper.composeEmail(
-                    email,
-                    'Subject: Example',
-                    'Body: This is an example email.',
-                  );
+                  await UrlLauncherHelper.launchEmail(context, email);
                 }
               },
-              child: const Text('Compose Email'),
+              child: const Text('Send Email'),
             ),
             const SizedBox(height: 16),
+
+            // Website Input Field with Hint Text
             TextField(
               controller: websiteController,
               decoration: const InputDecoration(
                 labelText: 'Enter Website URL',
+                hintText: 'e.g. https://www.example.com',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.url,
@@ -82,12 +87,49 @@ class _UrlLauncherUIState extends State<UrlLauncherUI> {
               onPressed: () async {
                 final website = websiteController.text.trim();
                 if (website.isNotEmpty) {
-                  await UrlLauncherHelper.launchWebsite(website);
+                  await UrlLauncherHelper.launchWebsite(context, website);
                 }
               },
               child: const Text('Open Website'),
             ),
             const SizedBox(height: 16),
+            TextField(
+              controller: phoneControllerSms,
+              decoration: const InputDecoration(
+                labelText: 'Enter Phone Number',
+                hintText: 'e.g. 01015415210',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 6),
+            // SMS Message Input Fields
+            TextField(
+              controller: messageController,
+              decoration: const InputDecoration(
+                labelText: 'Enter SMS Meaasge',
+                hintText: 'Type your message here...',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.text,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final phone = "+2${phoneControllerSms.text.trim()}";
+                final message = messageController.text.trim();
+                if (phone.isNotEmpty && message.isNotEmpty) {
+                  await UrlLauncherHelper.sendSms(
+                    context,
+                    phone,
+                    message: message,
+                  );
+                }
+              },
+              child: const Text('Send SMS'),
+            ),
+            const SizedBox(height: 16),
+            // Latitude and Longitude Input Fields
             Row(
               children: [
                 Expanded(
@@ -95,6 +137,7 @@ class _UrlLauncherUIState extends State<UrlLauncherUI> {
                     controller: latitudeController,
                     decoration: const InputDecoration(
                       labelText: 'Latitude',
+                      hintText: 'e.g. 37.7749',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -106,6 +149,7 @@ class _UrlLauncherUIState extends State<UrlLauncherUI> {
                     controller: longitudeController,
                     decoration: const InputDecoration(
                       labelText: 'Longitude',
+                      hintText: 'e.g. -122.4194',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -121,7 +165,8 @@ class _UrlLauncherUIState extends State<UrlLauncherUI> {
                 final longitude =
                     double.tryParse(longitudeController.text.trim());
                 if (latitude != null && longitude != null) {
-                  await UrlLauncherHelper.openMaps(latitude, longitude);
+                  await UrlLauncherHelper.openMaps(
+                      context, latitude, longitude);
                 }
               },
               child: const Text('Open Maps'),
